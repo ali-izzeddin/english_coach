@@ -30,6 +30,7 @@ a { color: inherit; }
 .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; font-size: 17px; }
 .mark { width: 36px; height: 36px; border-radius: 11px; background: var(--brand); color: var(--brand-ink); display: grid; place-items: center; font: 800 15px Inter, sans-serif; }
 .top-stats { display: flex; gap: 8px; font-size: 14px; font-weight: 600; }
+a.pill { text-decoration: none; color: inherit; }
 .pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); }
 
 .view { max-width: 640px; margin: 0 auto; padding: 18px 16px 110px; outline: none; }

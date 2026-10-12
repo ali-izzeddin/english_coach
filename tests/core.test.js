@@ -10,7 +10,8 @@ const C = require("../app/core.js");
 
 function data() {
   const box = { window: {} };
-  vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../app/data.js"), "utf8"), box);
+  const ctx = vm.createContext(box);
+  for (const f of ["data.js", "data_levels.js"]) vm.runInContext(fs.readFileSync(path.join(__dirname, "../app", f), "utf8"), ctx);
   return box.window.EC_DATA;
 }
 const T0 = new Date(2026, 9, 12, 10, 0).getTime();
@@ -19,7 +20,48 @@ test("course data is valid (ids, topics, every exercise answerable)", () => {
   assert.deepEqual(C.validateData(data()), []);
   const d = data();
   assert.ok(d.words.length >= 100, "at least 100 words");
-  assert.ok(d.grammar.length >= 12, "at least 12 grammar lessons");
+  assert.ok(d.grammar.length >= 24, "at least 24 grammar lessons");
+  for (const lv of C.LEVELS) {
+    assert.ok(d.words.some((w) => w.lv === lv), "words for " + lv);
+    assert.ok(d.writing.some((x) => x.lv === lv), "writing for " + lv);
+    const mc = d.grammar.filter((g) => g.lv === lv).reduce((n, g) => n + g.exercises.filter((x) => x.type === "mc").length, 0);
+    assert.ok(mc >= 4, "placement needs 4 mc questions for " + lv + " (has " + mc + ")");
+  }
+});
+
+test("writing answers: contractions and long-sentence typos", () => {
+  assert.equal(C.canon("I'm sure it's fine, don't worry!"), "i am sure it is fine do not worry");
+  assert.equal(C.checkAnswer("I can't come", "I cannot come."), "correct");
+  assert.equal(C.checkAnswer("She won't be late", ["She will not be late."]), "correct");
+  assert.equal(C.checkAnswer("We've finished the report", "We have finished the report."), "correct");
+  assert.equal(C.checkAnswer("I would have tld you abot it", "I would have told you about it."), "almost");
+  assert.equal(C.checkAnswer("I recieve emails", "I receive emails."), "almost");
+  assert.equal(C.checkAnswer("He goes home", "He went home."), "wrong");
+  const d = data();
+  for (const x of d.writing) for (const a of x.answers) assert.equal(C.checkAnswer(a, x.answers), "correct", x.id);
+});
+
+test("placement: highest level passed in a row decides the next level", () => {
+  const s = (r) => ({ right: r, total: 4 });
+  assert.deepEqual(C.placement({}), { level: null, study: "A1" });
+  assert.deepEqual(C.placement({ A1: s(2), A2: s(4) }), { level: null, study: "A1" });
+  assert.deepEqual(C.placement({ A1: s(4), A2: s(3), B1: s(1), B2: s(4) }), { level: "A2", study: "B1" });
+  assert.deepEqual(C.placement({ A1: s(4), A2: s(4), B1: s(4), B2: s(4), C1: s(4) }), { level: "C1", study: "C1" });
+  assert.equal(C.levelIndex("B2"), 3);
+  assert.equal(C.levelIndex("Z9"), -1);
+});
+
+test("writing tasks: key phrases with alternatives", () => {
+  assert.deepEqual(C.keyHits("Dear Sam, I'm writing to ask about the job. Best regards", ["dear", "I am writing|I write", "regards|thanks"]), [true, true, true]);
+  assert.deepEqual(C.keyHits("Hi, see you", ["dear", "see you"]), [false, true]);
+  const d = data();
+  for (const t of d.tasks) assert.ok(C.keyHits(t.model, t.keys).every(Boolean), t.id);
+});
+
+test("new words can be filtered by level", () => {
+  const ws = [{ id: "a", t: "x", lv: "A1" }, { id: "b", t: "x", lv: "B2" }, { id: "c", t: "y", lv: "B2" }];
+  assert.deepEqual(C.newWords(ws, {}, null, "B2").map((w) => w.id), ["b", "c"]);
+  assert.deepEqual(C.newWords(ws, { b: {} }, "x", "B2").map((w) => w.id), []);
 });
 
 test("answers: case, punctuation and apostrophes don't matter; one typo = almost", () => {

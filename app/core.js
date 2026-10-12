@@ -7,7 +7,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
 
-  var VERSION = "1.0.0";
+  var VERSION = "2.0.0";
   var DAY = 86400000;
   var DAILY_GOAL = 30; // XP
 
@@ -36,17 +36,30 @@
     return d[m][n];
   }
 
+  var CONTRACTIONS = [
+    [/\bcan't\b|\bcan not\b/g, "cannot"], [/\bwon't\b/g, "will not"], [/\bshan't\b/g, "shall not"], [/\blet's\b/g, "let us"],
+    [/n't\b/g, " not"], [/'re\b/g, " are"], [/'ve\b/g, " have"], [/'ll\b/g, " will"], [/'m\b/g, " am"],
+    [/\b(it|that|what|there|he|she|who|where|here)'s\b/g, "$1 is"]
+  ];
+  /** normalize() + expanded contractions, so "I'm" = "I am" and "don't" = "do not". */
+  function canon(s) {
+    var t = normalize(s);
+    CONTRACTIONS.forEach(function (r) { t = t.replace(r[0], r[1]); });
+    return t.replace(/\s+/g, " ").trim();
+  }
+
   /**
    * Check a typed answer. accepted = string or list of strings.
    * Returns "correct", "almost" (one small typo in a longer answer) or "wrong".
    */
   function checkAnswer(given, accepted) {
-    var g = normalize(given);
-    var list = [].concat(accepted).map(normalize);
+    var g = canon(given);
+    var list = [].concat(accepted).map(canon);
     if (!g) return "wrong";
     if (list.indexOf(g) >= 0) return "correct";
     for (var i = 0; i < list.length; i++) {
-      if (list[i].length >= 5 && levenshtein(g, list[i]) === 1) return "almost";
+      var allowed = list[i].length >= 20 ? 2 : list[i].length >= 5 ? 1 : 0;
+      if (allowed && levenshtein(g, list[i]) <= allowed) return "almost";
     }
     return "wrong";
   }
@@ -80,8 +93,34 @@
   }
 
   /** Words never studied, in course order, optionally for one topic. */
-  function newWords(words, cards, topic) {
-    return words.filter(function (w) { return !cards[w.id] && (!topic || w.t === topic); });
+  function newWords(words, cards, topic, lv) {
+    return words.filter(function (w) { return !cards[w.id] && (!topic || w.t === topic) && (!lv || w.lv === lv); });
+  }
+
+  var LEVELS = ["A1", "A2", "B1", "B2", "C1"];
+  function levelIndex(lv) { return LEVELS.indexOf(lv); }
+
+  /**
+   * Placement test result. scores = {A1: {right, total}, ...}. A level is passed with 75%+.
+   * Returns {level: highest level passed in a row (or null), study: the level to study next}.
+   */
+  function placement(scores) {
+    var passed = null;
+    for (var i = 0; i < LEVELS.length; i++) {
+      var s = scores[LEVELS[i]];
+      if (!s || !s.total || s.right / s.total < 0.75) break;
+      passed = LEVELS[i];
+    }
+    var next = passed == null ? "A1" : LEVELS[Math.min(levelIndex(passed) + 1, LEVELS.length - 1)];
+    return { level: passed, study: next };
+  }
+
+  /** Writing task key phrases: each key is "a|b|c" (any one counts). Returns [true/false, ...]. */
+  function keyHits(text, keys) {
+    var t = " " + canon(text) + " ";
+    return keys.map(function (k) {
+      return k.split("|").some(function (alt) { return t.indexOf(" " + canon(alt) + " ") >= 0 || t.indexOf(canon(alt)) >= 0; });
+    });
   }
 
   function dayKey(date) {
@@ -159,6 +198,20 @@
       ids[w.id] = true;
       if (!topics[w.t]) errs.push("word " + w.id + " has unknown topic " + w.t);
       if (!w.en || !w.ar || !w.ex || !w.exAr) errs.push("word " + w.id + " is missing text");
+      if (d.levels && LEVELS.indexOf(w.lv) < 0) errs.push("word " + w.id + " has no valid level");
+    });
+    var gids = {};
+    (d.grammar || []).forEach(function (g) {
+      if (gids[g.id]) errs.push("duplicate lesson id " + g.id);
+      gids[g.id] = true;
+      if (d.levels && LEVELS.indexOf(g.lv) < 0) errs.push("lesson " + g.id + " has no valid level");
+    });
+    (d.writing || []).forEach(function (x) {
+      if (!x.ar || !x.answers || !x.answers.length || LEVELS.indexOf(x.lv) < 0) errs.push("writing " + x.id + " is incomplete");
+    });
+    (d.tasks || []).forEach(function (t) {
+      if (!t.model || !t.keys || !t.keys.length) errs.push("task " + t.id + " is incomplete");
+      else if (keyHits(t.model, t.keys).indexOf(false) >= 0) errs.push("task " + t.id + " model answer misses one of its own key phrases");
     });
     (d.grammar || []).forEach(function (g) {
       (g.exercises || []).forEach(function (x, i) {
@@ -173,7 +226,7 @@
 
   return {
     VERSION: VERSION, DAY: DAY, DAILY_GOAL: DAILY_GOAL, normalize: normalize, levenshtein: levenshtein,
-    checkAnswer: checkAnswer, schedule: schedule, isLearned: isLearned, dueWords: dueWords, newWords: newWords,
+    checkAnswer: checkAnswer, canon: canon, LEVELS: LEVELS, levelIndex: levelIndex, placement: placement, keyHits: keyHits, schedule: schedule, isLearned: isLearned, dueWords: dueWords, newWords: newWords,
     dayKey: dayKey, addXp: addXp, currentStreak: currentStreak, level: level, shuffle: shuffle,
     wordQuestion: wordQuestion, checkOrder: checkOrder, lessonDone: lessonDone, validateData: validateData
   };

@@ -1,44 +1,359 @@
 [
-  { "name": "Home renders", "root": "../..", "page": "app/index.html",
-    "init": "try { localStorage.clear(); } catch (e) {}",
-    "steps": [ { "eval": "document.querySelectorAll('.tile').length === 6" }, { "screenshot": "ec_home" } ] },
-  { "name": "Learn 5 AI words, take the check, cards get scheduled", "root": "../..", "page": "app/index.html#/learn/ai",
-    "init": "try { localStorage.clear(); } catch (e) {}",
-    "steps": [
-      { "expectText": { "selector": ".flash .word", "contains": "relevant" } },
-      { "screenshot": "ec_learn_card" },
-      { "click": "[data-act='next']" }, { "click": "[data-act='next']" }, { "click": "[data-act='next']" }, { "click": "[data-act='next']" }, { "click": "[data-act='next']" },
-      { "expectVisible": ".opt" },
-      { "eval": "(async () => { for (let n = 0; n < 5; n++) { document.querySelector('.opt').click(); await new Promise(r => setTimeout(r, 120)); if (!document.querySelector('#fb .feedback')) return false; document.querySelector('[data-act=next]').click(); await new Promise(r => setTimeout(r, 120)); } return !!document.querySelector('.result'); })()" },
-      { "eval": "Object.keys(JSON.parse(localStorage.getItem('ec:v1')).cards).length === 5" },
-      { "screenshot": "ec_result" }
-    ] },
-  { "name": "Grammar lesson: all three exercise types work", "root": "../..", "page": "app/index.html#/grammar/articles",
-    "init": "try { localStorage.clear(); } catch (e) {}",
-    "steps": [
-      { "expectVisible": ".explain" },
-      { "click": "[data-act='go']" },
-      { "eval": "(async () => { const w = ms => new Promise(r => setTimeout(r, ms)); for (let n = 0; n < 6; n++) { if (document.querySelector('.opt')) document.querySelector('.opt').click(); else if (document.querySelector('#ans')) { const i = document.querySelector('#ans'); i.value = 'the'; document.querySelector('[data-act=check]').click(); } else if (document.querySelector('#pool')) { document.querySelectorAll('#pool .wbtn').forEach(b => b.click()); await w(50); document.querySelector('[data-act=check]').click(); } await w(120); if (!document.querySelector('#fb .feedback')) return 'no feedback at ' + n; document.querySelector('[data-act=next]').click(); await w(120); } return !!document.querySelector('.result'); })()" },
-      { "eval": "JSON.parse(localStorage.getItem('ec:v1')).lessons.articles.total === 6" },
-      { "screenshot": "ec_grammar_result" }
-    ] },
-  { "name": "Order exercise builds the right sentence", "root": "../..", "page": "app/index.html#/grammar/present",
-    "init": "try { localStorage.clear(); } catch (e) {}",
-    "steps": [
-      { "click": "[data-act='go']" },
-      { "eval": "(async () => { const w = ms => new Promise(r => setTimeout(r, ms)); for (let n = 0; n < 5; n++) { if (document.querySelector('.opt')) document.querySelector('.opt').click(); else { document.querySelector('#ans').value = 'x'; document.querySelector('[data-act=check]').click(); } await w(80); document.querySelector('[data-act=next]').click(); await w(80); } const want = 'I am learning English now'.split(' '); for (const word of want) { [...document.querySelectorAll('#pool .wbtn:not(.used)')].find(b => b.textContent === word).click(); await w(30); } document.querySelector('[data-act=check]').click(); await w(100); return document.querySelector('#fb .feedback.ok') !== null; })()" },
-      { "screenshot": "ec_order" }
-    ] },
-  { "name": "Phrases and stats pages", "root": "../..", "page": "app/index.html#/phrases",
-    "steps": [ { "eval": "document.querySelectorAll('.phrase').length >= 30" }, { "screenshot": "ec_phrases" } ] },
-  { "name": "Review: empty state then a due card", "root": "../..", "page": "app/index.html#/review",
-    "init": "try { localStorage.setItem('ec:v1', JSON.stringify({ cards: { deadline: { ef: 2.5, reps: 1, interval: 1, due: 1 } }, stats: {}, lessons: {} })); } catch (e) {}",
-    "steps": [
-      { "expectText": { "selector": ".flash .word", "contains": "deadline" } },
-      { "click": "[data-act='show']" },
-      { "expectVisible": "#back" },
-      { "click": "[data-g='5']" },
-      { "expectVisible": ".result" },
-      { "eval": "JSON.parse(localStorage.getItem('ec:v1')).cards.deadline.reps === 2" }
-    ] }
+ {
+  "name": "Home renders with placement banner and 8 tiles",
+  "root": "../..",
+  "page": "app/index.html",
+  "init": "try { localStorage.clear(); } catch (e) {}",
+  "steps": [
+   {
+    "eval": "document.querySelectorAll('.tile').length === 8"
+   },
+   {
+    "eval": "!!document.querySelector('a[href=\"#/placement\"]')"
+   },
+   {
+    "expectText": {
+     "selector": "#topStats",
+     "contains": "A2"
+    }
+   },
+   {
+    "screenshot": "ec_home"
+   }
+  ]
+ },
+ {
+  "name": "Learn 5 AI words, take the check, cards get scheduled",
+  "root": "../..",
+  "page": "app/index.html#/learn/B1/ai",
+  "init": "try { localStorage.clear(); } catch (e) {}",
+  "steps": [
+   {
+    "expectText": {
+     "selector": ".flash .word",
+     "contains": "relevant"
+    }
+   },
+   {
+    "screenshot": "ec_learn_card"
+   },
+   {
+    "click": "[data-act='next']"
+   },
+   {
+    "click": "[data-act='next']"
+   },
+   {
+    "click": "[data-act='next']"
+   },
+   {
+    "click": "[data-act='next']"
+   },
+   {
+    "click": "[data-act='next']"
+   },
+   {
+    "expectVisible": ".opt"
+   },
+   {
+    "eval": "(async () => { for (let n = 0; n < 5; n++) { document.querySelector('.opt').click(); await new Promise(r => setTimeout(r, 120)); if (!document.querySelector('#fb .feedback')) return false; document.querySelector('[data-act=next]').click(); await new Promise(r => setTimeout(r, 120)); } return !!document.querySelector('.result'); })()"
+   },
+   {
+    "eval": "Object.keys(JSON.parse(localStorage.getItem('ec:v1')).cards).length === 5"
+   },
+   {
+    "screenshot": "ec_result"
+   }
+  ]
+ },
+ {
+  "name": "Learn: level chips and topics of the chosen level",
+  "root": "../..",
+  "page": "app/index.html#/learn/C1",
+  "init": "try { localStorage.clear(); } catch (e) {}",
+  "steps": [
+   {
+    "eval": "document.querySelectorAll('.chip-row .chip').length === 5 && document.querySelector('.chip.on').textContent === 'C1'"
+   },
+   {
+    "eval": "document.querySelectorAll('.lrow').length === 1"
+   },
+   {
+    "screenshot": "ec_learn_c1"
+   }
+  ]
+ },
+ {
+  "name": "Grammar lesson: all three exercise types work",
+  "root": "../..",
+  "page": "app/index.html#/grammar/articles",
+  "init": "try { localStorage.clear(); } catch (e) {}",
+  "steps": [
+   {
+    "expectVisible": ".explain"
+   },
+   {
+    "click": "[data-act='go']"
+   },
+   {
+    "eval": "(async () => { const w = ms => new Promise(r => setTimeout(r, ms)); for (let n = 0; n < 6; n++) { if (document.querySelector('.opt')) document.querySelector('.opt').click(); else if (document.querySelector('#ans')) { const i = document.querySelector('#ans'); i.value = 'the'; document.querySelector('[data-act=check]').click(); } else if (document.querySelector('#pool')) { document.querySelectorAll('#pool .wbtn').forEach(b => b.click()); await w(50); document.querySelector('[data-act=check]').click(); } await w(120); if (!document.querySelector('#fb .feedback')) return 'no feedback at ' + n; document.querySelector('[data-act=next]').click(); await w(120); } return !!document.querySelector('.result'); })()"
+   },
+   {
+    "eval": "JSON.parse(localStorage.getItem('ec:v1')).lessons.articles.total === 6"
+   },
+   {
+    "screenshot": "ec_grammar_result"
+   }
+  ]
+ },
+ {
+  "name": "Order exercise builds the right sentence",
+  "root": "../..",
+  "page": "app/index.html#/grammar/present",
+  "init": "try { localStorage.clear(); } catch (e) {}",
+  "steps": [
+   {
+    "click": "[data-act='go']"
+   },
+   {
+    "eval": "(async () => { const w = ms => new Promise(r => setTimeout(r, ms)); for (let n = 0; n < 5; n++) { if (document.querySelector('.opt')) document.querySelector('.opt').click(); else { document.querySelector('#ans').value = 'x'; document.querySelector('[data-act=check]').click(); } await w(80); document.querySelector('[data-act=next]').click(); await w(80); } const want = 'I am learning English now'.split(' '); for (const word of want) { [...document.querySelectorAll('#pool .wbtn:not(.used)')].find(b => b.textContent === word).click(); await w(30); } document.querySelector('[data-act=check]').click(); await w(100); return document.querySelector('#fb .feedback.ok') !== null; })()"
+   },
+   {
+    "screenshot": "ec_order"
+   }
+  ]
+ },
+ {
+  "name": "Phrases and stats pages",
+  "root": "../..",
+  "page": "app/index.html#/phrases",
+  "steps": [
+   {
+    "eval": "document.querySelectorAll('.phrase').length >= 30"
+   },
+   {
+    "screenshot": "ec_phrases"
+   }
+  ]
+ },
+ {
+  "name": "Review: empty state then a due card",
+  "root": "../..",
+  "page": "app/index.html#/review",
+  "init": "try { localStorage.setItem('ec:v1', JSON.stringify({ cards: { deadline: { ef: 2.5, reps: 1, interval: 1, due: 1 } }, stats: {}, lessons: {} })); } catch (e) {}",
+  "steps": [
+   {
+    "expectText": {
+     "selector": ".flash .word",
+     "contains": "deadline"
+    }
+   },
+   {
+    "click": "[data-act='show']"
+   },
+   {
+    "expectVisible": "#back"
+   },
+   {
+    "click": "[data-g='5']"
+   },
+   {
+    "expectVisible": ".result"
+   },
+   {
+    "eval": "JSON.parse(localStorage.getItem('ec:v1')).cards.deadline.reps === 2"
+   }
+  ]
+ },
+ {
+  "name": "Placement test: 20 questions, result sets the level",
+  "root": "../..",
+  "page": "app/index.html#/placement",
+  "init": "try { localStorage.clear(); } catch (e) {}",
+  "steps": [
+   {
+    "click": "[data-act='go']"
+   },
+   {
+    "eval": "(async () => { const w = ms => new Promise(r => setTimeout(r, ms)); const D = window.EC_DATA; let n = 0; while (document.querySelector('.opt') && n < 30) { const q = document.querySelector('.q-prompt span').textContent; let right = null; D.grammar.forEach(g => g.exercises.forEach(x => { if (x.type === 'mc' && x.q === q && (g.lv === 'A1' || g.lv === 'A2')) right = x.answer; })); const opts = [...document.querySelectorAll('.opt')]; (opts.find(o => right !== null ? o.dataset.o === right : o.dataset.o !== findAns(q)) || opts[0]).click(); await w(350); n++; } function findAns(q) { let a = null; D.grammar.forEach(g => g.exercises.forEach(x => { if (x.q === q) a = x.answer; })); return a; } return n === 20 && !!document.querySelector('.result'); })()"
+   },
+   {
+    "eval": "(() => { const s = JSON.parse(localStorage.getItem('ec:v1')); return s.placed === true && s.level === 'B1'; })()"
+   },
+   {
+    "expectText": {
+     "selector": ".result .big",
+     "contains": "B1"
+    }
+   },
+   {
+    "screenshot": "ec_placement_result"
+   }
+  ]
+ },
+ {
+  "name": "Writing: translate 6 A1 sentences (incl. self-accept)",
+  "root": "../..",
+  "page": "app/index.html#/write/A1",
+  "init": "try { localStorage.setItem('ec:v1', JSON.stringify({ level: 'A1', placed: true })); } catch (e) {}",
+  "steps": [
+   {
+    "screenshot": "ec_write"
+   },
+   {
+    "click": "[data-act='go']"
+   },
+   {
+    "expectVisible": "#ans"
+   },
+   {
+    "screenshot": "ec_write_q"
+   },
+   {
+    "eval": "(async () => { const w = ms => new Promise(r => setTimeout(r, ms)); const D = window.EC_DATA; for (let n = 0; n < 6; n++) { const ar = document.querySelector('.q-prompt span').textContent; const x = D.writing.find(i => i.ar === ar); if (!x) return 'no item for ' + ar; const i = document.querySelector('#ans'); i.value = n === 0 ? 'something else entirely' : x.answers[x.answers.length - 1]; document.querySelector('[data-act=check]').click(); await w(100); if (n === 0) { if (!document.querySelector('#fb .feedback.bad') || !document.querySelector('[data-act=self]')) return 'no self-accept'; document.querySelector('[data-act=self]').click(); } else if (!document.querySelector('#fb .feedback.ok')) return 'not ok at ' + n + ': ' + i.value; document.querySelector('[data-act=next]').click(); await w(100); } return document.querySelector('.result .big').textContent === '6/6'; })()"
+   },
+   {
+    "eval": "Object.keys(JSON.parse(localStorage.getItem('ec:v1')).writing).length === 6"
+   },
+   {
+    "screenshot": "ec_write_result"
+   }
+  ]
+ },
+ {
+  "name": "Writing task: checklist and model answer",
+  "root": "../..",
+  "page": "app/index.html#/task/t1",
+  "init": "try { localStorage.setItem('ec:v1', JSON.stringify({ level: 'A1', placed: true })); } catch (e) {}",
+  "steps": [
+   {
+    "fill": {
+     "selector": "#txt",
+     "value": "Hello, my name is Sara. I am from Amman. I am a student and I like music."
+    }
+   },
+   {
+    "click": "[data-act='check']"
+   },
+   {
+    "eval": "document.querySelectorAll('#out .done-mark').length === 4"
+   },
+   {
+    "expectText": {
+     "selector": "#out",
+     "contains": "Zarqa University"
+    }
+   },
+   {
+    "eval": "JSON.parse(localStorage.getItem('ec:v1')).notes.t1.indexOf('Sara') > 0"
+   },
+   {
+    "screenshot": "ec_task"
+   }
+  ]
+ },
+ {
+  "name": "My words: add, appears in review, delete",
+  "root": "../..",
+  "page": "app/index.html#/mine",
+  "init": "try { localStorage.setItem('ec:v1', JSON.stringify({ level: 'A1', placed: true })); } catch (e) {}",
+  "steps": [
+   {
+    "fill": {
+     "selector": "input[name=en]",
+     "value": "break the ice"
+    }
+   },
+   {
+    "fill": {
+     "selector": "input[name=ar]",
+     "value": "يكسر الجمود"
+    }
+   },
+   {
+    "click": "#add button[type=submit]"
+   },
+   {
+    "eval": "document.querySelectorAll('.phrase').length === 1"
+   },
+   {
+    "screenshot": "ec_mine"
+   },
+   {
+    "eval": "(async () => { location.hash = '#/review'; await new Promise(r => setTimeout(r, 200)); return document.querySelector('.flash .word').textContent === 'break the ice'; })()"
+   },
+   {
+    "eval": "(async () => { location.hash = '#/mine'; await new Promise(r => setTimeout(r, 200)); document.querySelector('[data-del]').click(); await new Promise(r => setTimeout(r, 100)); const s = JSON.parse(localStorage.getItem('ec:v1')); return s.custom.length === 0 && Object.keys(s.cards).length === 0; })()"
+   }
+  ]
+ },
+ {
+  "name": "Level path: choose a level",
+  "root": "../..",
+  "page": "app/index.html#/level",
+  "init": "try { localStorage.setItem('ec:v1', JSON.stringify({ level: 'A1', placed: true })); } catch (e) {}",
+  "steps": [
+   {
+    "eval": "document.querySelectorAll('[data-lv]').length === 5"
+   },
+   {
+    "click": "[data-lv='B2']"
+   },
+   {
+    "expectText": {
+     "selector": "#topStats",
+     "contains": "B2"
+    }
+   },
+   {
+    "eval": "JSON.parse(localStorage.getItem('ec:v1')).level === 'B2'"
+   },
+   {
+    "screenshot": "ec_level"
+   }
+  ]
+ },
+ {
+  "name": "Grammar list grouped by level; a C1 lesson works",
+  "root": "../..",
+  "page": "app/index.html#/grammar",
+  "init": "try { localStorage.setItem('ec:v1', JSON.stringify({ level: 'A1', placed: true })); } catch (e) {}",
+  "steps": [
+   {
+    "eval": "document.querySelectorAll('.view h2').length === 5 && document.querySelectorAll('.lrow').length >= 24"
+   },
+   {
+    "eval": "(async () => { location.hash = '#/grammar/inversion'; await new Promise(r => setTimeout(r, 150)); return !!document.querySelector('.explain'); })()"
+   },
+   {
+    "screenshot": "ec_grammar_c1"
+   }
+  ]
+ },
+ {
+  "name": "Practice mixes words, grammar and writing",
+  "root": "../..",
+  "page": "app/index.html#/practice",
+  "init": "try { localStorage.setItem('ec:v1', JSON.stringify({ level: 'A1', placed: true })); } catch (e) {}",
+  "steps": [
+   {
+    "eval": "(async () => { const w = ms => new Promise(r => setTimeout(r, ms)); let n = 0; while (!document.querySelector('.result') && n < 15) { if (document.querySelector('.opt')) document.querySelector('.opt').click(); else if (document.querySelector('#ans')) { document.querySelector('#ans').value = 'x'; document.querySelector('[data-act=check]').click(); } else if (document.querySelector('#pool')) { document.querySelectorAll('#pool .wbtn').forEach(b => b.click()); await w(40); document.querySelector('[data-act=check]').click(); } await w(120); document.querySelector('[data-act=next]').click(); await w(120); n++; } return n === 10; })()"
+   }
+  ]
+ },
+ {
+  "name": "Stats in dark mode",
+  "root": "../..",
+  "page": "app/index.html#/stats",
+  "init": "try { localStorage.setItem('ec:v1', JSON.stringify({ level: 'A1', placed: true })); } catch (e) {}",
+  "colorScheme": "dark",
+  "steps": [
+   {
+    "eval": "document.querySelectorAll('.stat').length === 10"
+   },
+   {
+    "screenshot": "ec_stats_dark"
+   }
+  ]
+ }
 ]
