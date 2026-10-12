@@ -1,0 +1,26 @@
+English Coach - Licence
+Copyright (c) 2026 Ali Izzeddin Mohammad Hasan. All rights reserved.
+
+This product is licensed, not sold. Your purchase gives you the licence of the edition you bought:
+
+RESTAURANT EDITION
+  - Use the menu for ONE restaurant, café or shop (one brand, its branches included) that you own or run.
+  - Change the code, design, texts and data as you like for that business.
+
+AGENCY EDITION
+  - Everything in the Restaurant edition, for an UNLIMITED number of businesses, including your clients'
+    businesses. You may charge your clients for setting it up, hosting it and editing their menus.
+
+Both editions:
+  - You may NOT resell, share, publish or give away the source code or this package, as it is or modified,
+    as a template, theme, product or download (for example on marketplaces, GitHub or file-sharing sites).
+    A live menu website for a business is fine; selling or sharing the files is not.
+  - Keep this licence file and the copyright lines in the source files.
+  - The product is provided "as is", without warranty of any kind. The author is not liable for any loss or
+    damage arising from its use, including lost or wrong orders, prices or downtime.
+
+Third-party code included:
+  - tools/lib/qrcode.min.js - "QR Code Generator for JavaScript" by Kazuhiko Arase, MIT licence
+    (see tools/lib/qrcode-LICENSE.txt). It is used only by the QR maker page.
+
+Questions: contact the seller through the page where you bought the product.

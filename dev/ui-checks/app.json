@@ -1,0 +1,44 @@
+[
+  { "name": "Home renders", "root": "../..", "page": "app/index.html",
+    "init": "try { localStorage.clear(); } catch (e) {}",
+    "steps": [ { "eval": "document.querySelectorAll('.tile').length === 6" }, { "screenshot": "ec_home" } ] },
+  { "name": "Learn 5 AI words, take the check, cards get scheduled", "root": "../..", "page": "app/index.html#/learn/ai",
+    "init": "try { localStorage.clear(); } catch (e) {}",
+    "steps": [
+      { "expectText": { "selector": ".flash .word", "contains": "relevant" } },
+      { "screenshot": "ec_learn_card" },
+      { "click": "[data-act='next']" }, { "click": "[data-act='next']" }, { "click": "[data-act='next']" }, { "click": "[data-act='next']" }, { "click": "[data-act='next']" },
+      { "expectVisible": ".opt" },
+      { "eval": "(async () => { for (let n = 0; n < 5; n++) { document.querySelector('.opt').click(); await new Promise(r => setTimeout(r, 120)); if (!document.querySelector('#fb .feedback')) return false; document.querySelector('[data-act=next]').click(); await new Promise(r => setTimeout(r, 120)); } return !!document.querySelector('.result'); })()" },
+      { "eval": "Object.keys(JSON.parse(localStorage.getItem('ec:v1')).cards).length === 5" },
+      { "screenshot": "ec_result" }
+    ] },
+  { "name": "Grammar lesson: all three exercise types work", "root": "../..", "page": "app/index.html#/grammar/articles",
+    "init": "try { localStorage.clear(); } catch (e) {}",
+    "steps": [
+      { "expectVisible": ".explain" },
+      { "click": "[data-act='go']" },
+      { "eval": "(async () => { const w = ms => new Promise(r => setTimeout(r, ms)); for (let n = 0; n < 6; n++) { if (document.querySelector('.opt')) document.querySelector('.opt').click(); else if (document.querySelector('#ans')) { const i = document.querySelector('#ans'); i.value = 'the'; document.querySelector('[data-act=check]').click(); } else if (document.querySelector('#pool')) { document.querySelectorAll('#pool .wbtn').forEach(b => b.click()); await w(50); document.querySelector('[data-act=check]').click(); } await w(120); if (!document.querySelector('#fb .feedback')) return 'no feedback at ' + n; document.querySelector('[data-act=next]').click(); await w(120); } return !!document.querySelector('.result'); })()" },
+      { "eval": "JSON.parse(localStorage.getItem('ec:v1')).lessons.articles.total === 6" },
+      { "screenshot": "ec_grammar_result" }
+    ] },
+  { "name": "Order exercise builds the right sentence", "root": "../..", "page": "app/index.html#/grammar/present",
+    "init": "try { localStorage.clear(); } catch (e) {}",
+    "steps": [
+      { "click": "[data-act='go']" },
+      { "eval": "(async () => { const w = ms => new Promise(r => setTimeout(r, ms)); for (let n = 0; n < 5; n++) { if (document.querySelector('.opt')) document.querySelector('.opt').click(); else { document.querySelector('#ans').value = 'x'; document.querySelector('[data-act=check]').click(); } await w(80); document.querySelector('[data-act=next]').click(); await w(80); } const want = 'I am learning English now'.split(' '); for (const word of want) { [...document.querySelectorAll('#pool .wbtn:not(.used)')].find(b => b.textContent === word).click(); await w(30); } document.querySelector('[data-act=check]').click(); await w(100); return document.querySelector('#fb .feedback.ok') !== null; })()" },
+      { "screenshot": "ec_order" }
+    ] },
+  { "name": "Phrases and stats pages", "root": "../..", "page": "app/index.html#/phrases",
+    "steps": [ { "eval": "document.querySelectorAll('.phrase').length >= 30" }, { "screenshot": "ec_phrases" } ] },
+  { "name": "Review: empty state then a due card", "root": "../..", "page": "app/index.html#/review",
+    "init": "try { localStorage.setItem('ec:v1', JSON.stringify({ cards: { deadline: { ef: 2.5, reps: 1, interval: 1, due: 1 } }, stats: {}, lessons: {} })); } catch (e) {}",
+    "steps": [
+      { "expectText": { "selector": ".flash .word", "contains": "deadline" } },
+      { "click": "[data-act='show']" },
+      { "expectVisible": "#back" },
+      { "click": "[data-g='5']" },
+      { "expectVisible": ".result" },
+      { "eval": "JSON.parse(localStorage.getItem('ec:v1')).cards.deadline.reps === 2" }
+    ] }
+]

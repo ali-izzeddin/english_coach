@@ -1,0 +1,34 @@
+<!doctype html>
+<!-- English Coach v1.0.0 - Copyright (c) 2026 Ali Izzeddin Mohammad Hasan. All rights reserved. See LICENSE.txt. -->
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>إنجليزي عملي - English Coach</title>
+  <meta name="description" content="تعلّم الإنجليزي العملي بالعربي: كلمات بالتكرار المتباعد، قواعد، نطق، وجمل جاهزة للشغل.">
+  <meta name="theme-color" content="#4f46e5">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%234f46e5'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='Arial' font-weight='700'%3EEn%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@500;600;700;800&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <a href="#/" class="logo"><span class="mark">En</span><b>إنجليزي عملي</b></a>
+    <div class="top-stats" id="topStats"></div>
+  </header>
+  <main id="view" class="view" tabindex="-1"></main>
+  <nav class="tabs" aria-label="التنقل">
+    <a href="#/" data-tab="home"><span>🏠</span>الرئيسية</a>
+    <a href="#/review" data-tab="review"><span>🔁</span>مراجعة</a>
+    <a href="#/grammar" data-tab="grammar"><span>📘</span>القواعد</a>
+    <a href="#/phrases" data-tab="phrases"><span>💬</span>جمل</a>
+    <a href="#/stats" data-tab="stats"><span>📊</span>تقدّمي</a>
+  </nav>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="data.js"></script>
+  <script src="core.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
